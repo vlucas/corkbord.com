@@ -1,0 +1,42 @@
+{
+  "name": "corkbord",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "portless corkbord hyperspan-dev dev",
+    "start": "NODE_ENV=production hyperspan start",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:push": "bunx drizzle-kit push",
+    "db:studio": "bunx drizzle-kit studio",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@hyperspan/framework": "^1.0.27",
+    "@hyperspan/html": "^1.0.4",
+    "better-auth": "^1.6.23",
+    "daisyui": "^5.5.19",
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.2",
+    "hyperspan": "^1.0.11",
+    "pg": "^8.22.0",
+    "portless": "^0.6.0",
+    "rss-parser": "^3.13.0",
+    "tailwindcss": "^4.1.18",
+    "typeid-js": "^1.2.0",
+    "uuidv7": "^1.1.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/debug": "^4.1.12",
+    "@types/pg": "^8.20.0",
+    "bun-types": "latest",
+    "drizzle-kit": "^0.31.10",
+    "oxfmt": "^0.58.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap");
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "@tailwindcss/typography";
+
+@plugin "daisyui/theme" {
+  name: "corkbord";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: oklch(96.5% 0.02 85);
+  --color-base-200: oklch(93% 0.025 82);
+  --color-base-300: oklch(88% 0.03 78);
+  --color-base-content: oklch(32% 0.04 55);
+  --color-primary: oklch(62% 0.12 45);
+  --color-primary-content: oklch(98% 0.01 85);
+  --color-secondary: oklch(78% 0.08 155);
+  --color-secondary-content: oklch(28% 0.04 155);
+  --color-accent: oklch(80% 0.1 230);
+  --color-accent-content: oklch(28% 0.05 230);
+  --color-neutral: oklch(45% 0.03 55);
+  --color-neutral-content: oklch(96% 0.01 85);
+  --color-info: oklch(72% 0.1 230);
+  --color-success: oklch(72% 0.12 145);
+  --color-warning: oklch(82% 0.12 85);
+  --color-error: oklch(65% 0.18 25);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.65rem;
+  --radius-box: 1rem;
+}
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.cork-bg {
+  background-color: oklch(94% 0.03 72);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -20%, oklch(88% 0.04 65 / 0.5), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  background-size:
+    auto,
+    180px 180px;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Card surface + small pastel accent dots */
+.content-card {
+  background: var(--color-base-100);
+  border: 1px solid color-mix(in oklch, var(--color-base-300) 55%, transparent);
+  border-radius: var(--radius-box);
+  box-shadow: 0 1px 2px oklch(40% 0.02 55 / 0.06);
+  padding: 1rem 1.125rem;
+}
+
+.accent-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.content-card-feed-item {
+  min-height: 5.75rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  padding: 1rem 1.125rem;
+}
+
+.content-card-feed-item:hover {
+  border-color: color-mix(in oklch, var(--color-primary) 25%, var(--color-base-300));
+}
+
+.accent-yellow {
+  background: oklch(82% 0.1 95);
+}
+.accent-mint {
+  background: oklch(78% 0.09 155);
+}
+.accent-blush {
+  background: oklch(80% 0.08 15);
+}
+.accent-sky {
+  background: oklch(78% 0.09 230);
+}
+
+.feed-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  min-height: calc(100vh - 4rem);
+}
+
+@media (min-width: 1024px) {
+  .feed-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  }
+}
+
+.content-item-selected {
+  outline: 2px solid oklch(62% 0.12 45 / 0.45);
+  outline-offset: 2px;
+}
