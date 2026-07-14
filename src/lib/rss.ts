@@ -8,6 +8,11 @@ export interface ParsedFeedItem {
   raw: Record<string, unknown>;
 }
 
+export interface ParsedRssFeed {
+  title: string | null;
+  items: ParsedFeedItem[];
+}
+
 const parser = new Parser({
   customFields: {
     item: ["content:encoded", "media:content"],
@@ -23,9 +28,27 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-export async function fetchRssFeed(url: string): Promise<ParsedFeedItem[]> {
+export function fallbackNameFromUrl(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "RSS feed";
+  }
+}
+
+export function resolveRssSourceName(
+  url: string,
+  feedTitle: string | null,
+  customName?: string,
+): string {
+  const trimmed = customName?.trim();
+  if (trimmed) return trimmed;
+  return feedTitle || fallbackNameFromUrl(url);
+}
+
+export async function fetchRssFeed(url: string): Promise<ParsedRssFeed> {
   const feed = await parser.parseURL(url);
-  return (feed.items ?? []).map((item) => {
+  const items = (feed.items ?? []).map((item) => {
     const rawContent =
       item["content:encoded"] ?? item.content ?? item.contentSnippet ?? item.summary ?? "";
     const body =
@@ -48,4 +71,9 @@ export async function fetchRssFeed(url: string): Promise<ParsedFeedItem[]> {
       raw: item as unknown as Record<string, unknown>,
     };
   });
+
+  return {
+    title: feed.title?.trim() || null,
+    items,
+  };
 }

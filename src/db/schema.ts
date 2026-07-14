@@ -127,7 +127,7 @@ export const sources = pgTable("sources", {
     .references(() => organization.id, { onDelete: "cascade" }),
   type: text("type").$type<SourceType>().notNull(),
   name: text("name").notNull(),
-  config: jsonb("config").$type<{ url?: string }>().notNull().default({}),
+  config: jsonb("config").$type<{ url?: string; autoName?: boolean }>().notNull().default({}),
   enabled: boolean("enabled").notNull().default(true),
   lastFetchedAt: timestamp("last_fetched_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

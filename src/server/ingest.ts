@@ -10,7 +10,7 @@ import {
   type OutboundStatus,
 } from "~/src/db/schema.ts";
 import { ID_PREFIX, newPublicId, newUuid } from "~/src/lib/ids.ts";
-import { fetchRssFeed } from "~/src/lib/rss.ts";
+import { fetchRssFeed, fallbackNameFromUrl, type ParsedRssFeed } from "~/src/lib/rss.ts";
 import { ensureOutboundRows } from "~/src/server/outbound/queries.ts";
 import { publishDuePosts } from "~/src/server/publish.ts";
 
@@ -55,11 +55,31 @@ export async function ingestRssSource(
   sourceId: string,
   organizationId: string,
   url: string,
+  prefetchedFeed?: ParsedRssFeed,
 ): Promise<number> {
-  const items = await fetchRssFeed(url);
+  const [source] = await db
+    .select({ config: sources.config })
+    .from(sources)
+    .where(eq(sources.id, sourceId))
+    .limit(1);
+
+  const feed = prefetchedFeed ?? (await fetchRssFeed(url));
+
+  if (source?.config?.autoName) {
+    const resolvedName = feed.title || fallbackNameFromUrl(url);
+    await db
+      .update(sources)
+      .set({
+        name: resolvedName,
+        config: { ...source.config, autoName: false },
+        updatedAt: new Date(),
+      })
+      .where(eq(sources.id, sourceId));
+  }
+
   let inserted = 0;
 
-  for (const item of items) {
+  for (const item of feed.items) {
     const existing = await db
       .select({ id: contentItems.id })
       .from(contentItems)
