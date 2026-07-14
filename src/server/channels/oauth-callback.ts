@@ -9,10 +9,7 @@ import {
 } from "~/src/db/schema.ts";
 import { encryptToken } from "~/src/lib/crypto.ts";
 import { ID_PREFIX, newPublicId, newUuid } from "~/src/lib/ids.ts";
-
-function baseUrl(): string {
-  return process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
-}
+import { oauthBaseUrl } from "~/src/server/channels/oauth-redirect.ts";
 
 function basicAuth(clientId: string, clientSecret: string): string {
   return Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -38,7 +35,7 @@ export async function completeOAuthCallback(
     return { redirect: "/app/channels?error=expired_state" };
   }
 
-  const redirectUri = `${baseUrl()}/api/oauth/${provider}/callback`;
+  const redirectUri = `${oauthBaseUrl()}/api/oauth/${provider}/callback`;
 
   try {
     if (provider === "x") {

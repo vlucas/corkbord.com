@@ -6,14 +6,19 @@ import AppLayout from "~/app/layouts/app-layout";
 import CreateRssSourceAction from "~/app/actions/create-rss-source-action.ts";
 import FetchSourcesNowAction from "~/app/actions/fetch-sources-now-action.ts";
 import ToggleSourceAction from "~/app/actions/toggle-source-action.ts";
+import UpdateRssSourceNameAction from "~/app/actions/update-rss-source-name-action.ts";
 import { listSources } from "~/src/server/sources/queries.ts";
 
 export default createRoute()
   .get(async (c) => {
     const { user, organizationId } = await requireActiveOrgUser(c);
+    const added = c.req.query.get("added") === "1";
 
     const content = html`
       <div class="mx-auto max-w-2xl space-y-6">
+        ${added
+          ? html`<div class="alert alert-success text-sm">RSS source added and fetched.</div>`
+          : ""}
         <div class="content-card shadow-sm">
           <div class="flex flex-col gap-4">
             <div>
@@ -51,23 +56,29 @@ async function renderSourcesList(
       ${sources.map(
         (s) => html`
           <li class="content-card shadow-sm">
-            <div class="flex flex-row flex-wrap items-center justify-between gap-2">
-              <div>
-                <p class="font-semibold m-0">${s.name}</p>
-                <p class="text-base-content/60 text-xs m-0">
-                  ${s.type}${s.config.url ? html` · ${s.config.url}` : ""}
-                </p>
-                ${s.lastFetchedAt
-                  ? html`<p class="text-base-content/50 text-xs m-0">
-                      Last fetched ${new Date(s.lastFetchedAt).toLocaleString()}
-                    </p>`
-                  : ""}
+            <div class="flex flex-col gap-3">
+              <div class="flex flex-row flex-wrap items-center justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                  ${s.type === "rss"
+                    ? UpdateRssSourceNameAction.render(c, {
+                        data: { publicId: s.publicId, name: s.name },
+                      })
+                    : html`<p class="font-semibold m-0">${s.name}</p>`}
+                  <p class="text-base-content/60 text-xs m-0">
+                    ${s.type}${s.config.url ? html` · ${s.config.url}` : ""}
+                  </p>
+                  ${s.lastFetchedAt
+                    ? html`<p class="text-base-content/50 text-xs m-0">
+                        Last fetched ${new Date(s.lastFetchedAt).toLocaleString()}
+                      </p>`
+                    : ""}
+                </div>
+                ${s.type === "rss"
+                  ? ToggleSourceAction.render(c, {
+                      data: { publicId: s.publicId, enabled: s.enabled ? "true" : "false" },
+                    })
+                  : html`<span class="badge badge-ghost">built-in</span>`}
               </div>
-              ${s.type === "rss"
-                ? ToggleSourceAction.render(c, {
-                    data: { publicId: s.publicId, enabled: s.enabled ? "true" : "false" },
-                  })
-                : html`<span class="badge badge-ghost">built-in</span>`}
             </div>
           </li>
         `,

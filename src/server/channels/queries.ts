@@ -5,6 +5,8 @@ import { channelAccounts, channelSettings, oauthStates } from "~/src/db/schema.t
 import { ID_PREFIX, newPublicId, newUuid, randomSlugSuffix } from "~/src/lib/ids.ts";
 import type { ChannelAccountDto } from "~/src/types/dto.ts";
 import { runIngestForOrganization } from "~/src/server/ingest.ts";
+import { oauthBaseUrl } from "~/src/server/channels/oauth-redirect.ts";
+import { linkedInScopeString } from "~/src/config/linkedin.ts";
 
 export async function listChannels(organizationId: string): Promise<ChannelAccountDto[]> {
   const rows = await db
@@ -40,8 +42,7 @@ export async function startChannelOAuth(
   const state = randomSlugSuffix(24);
   const verifier = randomBytes(32).toString("base64url");
   const challenge = createHash("sha256").update(verifier).digest("base64url");
-  const baseUrl = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
-  const redirectUri = `${baseUrl}/api/oauth/${input.provider}/callback`;
+  const redirectUri = `${oauthBaseUrl()}/api/oauth/${input.provider}/callback`;
 
   await db.insert(oauthStates).values({
     id: newUuid(),
@@ -73,16 +74,11 @@ export async function startChannelOAuth(
   const clientId = process.env.LINKEDIN_CLIENT_ID;
   if (!clientId) throw new Error("LinkedIn OAuth not configured (LINKEDIN_CLIENT_ID)");
 
-  const scopes =
-    input.targetType === "page"
-      ? "openid profile w_member_social w_organization_social r_organization_admin"
-      : "openid profile w_member_social";
-
   const params = new URLSearchParams({
     response_type: "code",
     client_id: clientId,
     redirect_uri: redirectUri,
-    scope: scopes,
+    scope: linkedInScopeString(input.targetType),
     state,
   });
   return `https://www.linkedin.com/oauth/v2/authorization?${params}`;
