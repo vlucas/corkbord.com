@@ -51,11 +51,30 @@ export interface LinkedInProfile {
 }
 
 export async function fetchLinkedInProfile(accessToken: string): Promise<LinkedInProfile> {
-  const res = await fetch(`${LINKEDIN_API}/v2/userinfo`, {
+  const userinfoRes = await fetch(`${LINKEDIN_API}/v2/userinfo`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
-  if (!res.ok) throw new Error("Failed to fetch LinkedIn profile");
-  return (await res.json()) as LinkedInProfile;
+  if (userinfoRes.ok) {
+    const profile = (await userinfoRes.json()) as LinkedInProfile;
+    return profile;
+  }
+
+  const meRes = await fetch(`${LINKEDIN_API}/v2/me`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!meRes.ok) throw new Error("Failed to fetch LinkedIn profile");
+
+  const me = (await meRes.json()) as {
+    id?: string;
+    localizedFirstName?: string;
+    localizedLastName?: string;
+  };
+  const name = [me.localizedFirstName, me.localizedLastName].filter(Boolean).join(" ").trim();
+
+  return {
+    sub: String(me.id ?? ""),
+    name: name || undefined,
+  };
 }
 
 export interface LinkedInOrganization {
