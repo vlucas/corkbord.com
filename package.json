@@ -7,7 +7,7 @@
     "dev": "portless corkbord hyperspan-dev dev",
     "start": "NODE_ENV=production hyperspan start",
     "db:generate": "bunx drizzle-kit generate",
-    "db:push": "bunx drizzle-kit push",
+    "db:migrate": "bunx drizzle-kit push",
     "db:studio": "bunx drizzle-kit studio",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
